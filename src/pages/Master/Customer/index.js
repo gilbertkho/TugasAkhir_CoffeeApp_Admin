@@ -14,11 +14,12 @@ import urlConfig from "config/backend";
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { toast, Zoom } from 'react-toastify';
 import Errormsg from 'config/errormsg';
+import getApiKey from 'config/getApiKey';
 
 export default function ListPendaftar() {
 
   const history = useHistory();
-  const [users, setUsers] = useState([]);
+  const [users, setUsers] = useState([]);  
   let [totalSize, setTotal] = useState(0);
   let [page, setPage] = useState(1);
   const sizePerPage = 10;
@@ -26,7 +27,8 @@ export default function ListPendaftar() {
   const [param, setParam] = useState({
     page: 1,
     count: sizePerPage,
-    nama_voucher: ''
+    search: '',
+    apikey: '',
   });
 
   const [toDelete, setToDelete] = useState(false);
@@ -37,7 +39,7 @@ export default function ListPendaftar() {
     setSelectedUser(user)
   };
 
-  const toEditUser = (user) => history.push('/master/voucher/edit', { user: user });
+  const toEditUser = (user) => history.push('/master/gerai/edit', { user: user });
 
   const [modal, setModal] = useState(false);
   const [selectedUser, setSelectedUser] = useState({});
@@ -57,9 +59,9 @@ export default function ListPendaftar() {
         <Button color="primary" className="mr-2" size="sm" onClick={(e) => { e.stopPropagation(); toEditUser(row) }}>
           <FontAwesomeIcon icon={['fa', 'edit']} />
         </Button>
-        <Button color="danger" className="mr-2" size="sm" onClick={(e) => { e.stopPropagation(); toggleDelete(row) }}>
+        {/* <Button color="danger" className="mr-2" size="sm" onClick={(e) => { e.stopPropagation(); toggleDelete(row) }}>
           <FontAwesomeIcon icon={['fa', 'trash-alt']} />
-        </Button>
+        </Button> */}
       </div>
     );
   }
@@ -70,29 +72,53 @@ export default function ListPendaftar() {
     )
   }
 
+  const statusFormat = (cell,row) => {
+    if(row.status_gerai === 'AKTIF'){
+      return <p className = 'text-success font-weight-bold m-0'>{row.status_gerai}</p>
+    }
+    else{
+      return <p className = 'text-warning font-weight-bold m-0'>{row.status_gerai}</p>
+    }
+  }
+
+  const statusVerifikas = (cell, row) => {
+    if(row.verified === 'TRUE'){
+      return <p className = 'text-info font-weight-bold m-0'>Verified</p>
+    }
+    else{
+      return <p className = 'text-danger font-weight-bold m-0'>Unverified</p>
+    }
+  }
+
   const columns = [{
     dataField: 'action',
     text: 'Action',
     formatter: GetActionFormat,
     headerStyle: (column, colIndex) => {
-      return { width: '240px' };
+      return { width: '200px' };
     }
   }, {
-    dataField: 'nama_voucher',
-    text: 'Nama Voucher'
-  }, {
-    dataField: 'deskripsi_voucher',
-    text: 'Deskripsi'
-  }, {
-    dataField: 'kode_voucher',
-    text: 'Kode Voucher'  
-  }, {
-    dataField: 'kuota_voucher',
-    text: 'Kuota'
+    dataField: 'nama',
+    text: 'Nama Gerai'
   },{
-    dataField: 'status_voucher',
-    text: 'Status'
-  }];
+    dataField: 'alamat',
+    text: 'Alamat'
+  },{
+    dataField: 'no_telp',
+    text: 'Nomor Telepon'
+  },{
+    dataField: 'nama_pemilik',
+    text: 'Nama Pemilik'
+  },{
+    dataField: 'status_gerai',
+    text: 'Status',
+    formatter: statusFormat
+  },
+  {
+    dataField: 'verified',
+    text: 'Verifikasi',
+    formatter: statusVerifikas
+  },];
 
   const selectRow = {
     mode: 'checkbox',
@@ -109,10 +135,10 @@ export default function ListPendaftar() {
 
   function fetchData(param) { 
     console.log(param)
-    axios.post('/app/gerai/voucher', param).then(({data}) => {
-        console.log(data)              
+    axios.post('/app/admin/customer', param).then(({data}) => {
+        console.log(data.data)
         if (data.status) {
-          setTotal(data.total)          
+          setTotal(data.total)
           setUsers(data.data)
         } else {
           toast.error(data.msg, { containerId: 'B', transition: Zoom });
@@ -127,23 +153,18 @@ export default function ListPendaftar() {
       })
   }
 
-  function getDetailRegister(id) {
-    toast.dismiss();
-    axios.post('/b/o/master/registered/period', JSON.stringify({ id: id })).then(res => res.data)
-      .then(data => {
-        // console.log("period", data);
-        setPeriod(data.data);
-      }).catch(error => {
-        // if (!error.response) {
-        //   alert(error)
-        //   return
-        // }
-        toast.error(Errormsg['500'], { containerId: 'B', transition: Zoom });
-      })
-  }
+  useEffect(() => {
+    getApiKey().then((key) => {
+      if(key.status){
+        setParam({...param, apikey: key.key});
+      }
+    })
+  },[])
 
   useEffect(() => {
-    fetchData(param)
+    if(param.apikey !== ''){
+      fetchData(param)
+    }
   }, [param]);
 
   const handleTableChange = (type, { page, sizePerPage }) => {
@@ -154,8 +175,8 @@ export default function ListPendaftar() {
   }
 
   const deleteHandler = async () => {
-    toast.dismiss();    
-    axios.post('app/gerai/voucher/delete', {id_voucher: selectedUser.id_voucher}).then(({data}) => {
+    toast.dismiss();
+    axios.post('app/admin/gerai/delete', {id_tipe: selectedUser.id_tipe}).then(({data}) => {
         if (data.status) {
           // if (page == 1) {
           //   fetchData(1, sizePerPage);
@@ -182,124 +203,72 @@ export default function ListPendaftar() {
 
   const handleSearch = (e) => {
     e.preventDefault()
-    setParam((prevState) => ({ ...prevState, page: 1, nama_voucher: searchRef.current.value }))
+    setParam((prevState) => ({ ...prevState, page: 1, search: searchRef.current.value }))
   }
 
   return (
     <>
       <Modal zIndex={2000} centered isOpen={modal} toggle={toggle}>
-        <ModalHeader toggle={toggle}>Detail Voucher</ModalHeader>
-        <ModalBody>          
+        <ModalHeader toggle={toggle}>Detail Gerai</ModalHeader>
+        <ModalBody>
           <Row>
-            <Col xs={5}>Nama Voucher</Col>
-            <Col xs={7}>{": " + selectedUser.nama_voucher}</Col>
+            <Col xs={4}>Nama Gerai</Col>
+            <Col xs={8}>{": " + selectedUser.nama}</Col>
           </Row>
           <Row>
-            <Col xs={5}>Deskripsi</Col>
-            <Col xs={7}>{": " + selectedUser.deskripsi_voucher}</Col>
-          </Row>          
-          <Row>
-            <Col xs={5}>Pembayaran Minimal</Col>
-            <Col xs={7}>{": " + selectedUser.minimal_pay}</Col>
+            <Col xs={4}>Alamat</Col>
+            <Col xs={8}>{": " + selectedUser.alamat}</Col>
           </Row>
           <Row>
-            <Col xs={5}>Nilai Diskon</Col>
-            <Col xs={7}>{": " + selectedUser.discount_value}</Col>
+            <Col xs={4}>Nomor Telepon</Col>
+            <Col xs={8}>: {selectedUser.no_telp}</Col>
           </Row>
           <Row>
-            <Col xs={5}>Kuota</Col>
-            <Col xs={7}>{": " + selectedUser.kuota_voucher}</Col>
+            <Col xs={4}>Nama Pemilik</Col>
+            <Col xs={8}>{": " + selectedUser.nama_pemilik}</Col>
           </Row>
           <Row>
-            <Col xs={5}>Kode Voucher</Col>
-            <Col xs={7}>{": " + selectedUser.kode_voucher}</Col>
-          </Row>          
-          <Row>
-            <Col xs={5}>Tanggal Berlaku</Col>
-            {selectedUser.time_start != '' ?
-              <Col xs={7}>{": " + moment(selectedUser.time_start).format('DD-MM-YYYY')}</Col>
-              :
-              <Col xs={7}>{": " + selectedUser.time_start}</Col>
-            }
+            <Col xs={4}>Email</Col>
+            <Col xs={8}>{": " + selectedUser.email}</Col>
           </Row>
           <Row>
-            <Col xs={5}>Tanggal Berakhir</Col>
-            {selectedUser.time_end != '' ?
-              <Col xs={7}>{": " + moment(selectedUser.time_end).format('DD-MM-YYYY')}</Col>
-              :
-              <Col xs={7}>{": " + selectedUser.time_end}</Col>
-            }
-          </Row>
-          <Row>
-            <Col xs={5}>Status Voucher</Col>
-            <Col xs={7}>{": " + selectedUser.status_voucher}</Col>
+            <Col xs={4}>Saldo</Col>
+            <Col xs={8}>{": " + selectedUser.saldo_gerai}</Col>
           </Row>         
+          <Row>
+            <Col xs={4}>Status</Col>
+            <Col xs={8}>{": " + selectedUser.status_gerai}</Col>
+          </Row>          
+          <Row>
+            <Col xs={4}>Verifikasi</Col>
+            <Col xs={8}>{": " + (selectedUser.verified === 'TRUE' ? 'Verified' : 'Unverified')}</Col>
+          </Row>
+          <Row>
+            <Col xs={4}>Masa Subscription</Col>
+            <Col xs={8}>{": " + (selectedUser.expire === 'EXPIRED' ? 'Tidak Berlangganan' : moment(selectedUser.expire).format('DD MMMM YYYY'))}</Col>
+          </Row>
+          <hr />
+          <Row>
+            <Col xs={4}>Foto / Logo Gerai</Col>
+            <Col xs={8}>
+              {selectedUser.profilepicture != '' &&
+                <img style={{ maxWidth: 200, maxHeight: 200 }} src={urlConfig.urlBackend + "app/admin/gerai_photo/" + selectedUser.foto_gerai + '/' + param.apikey} />
+              }
+            </Col>
+          </Row>
         </ModalBody>
         <ModalFooter>
           {/* <Button color="primary" onClick={toggle}>Do Something</Button>{' '} */}
           <Button color="secondary" onClick={toggle}>Tutup</Button>
         </ModalFooter>
       </Modal>
-      <Modal zIndex={2000} centered isOpen={toDelete} toggle={toggleDelete}>
-        <ModalHeader toggle={toggleDelete}>Apakah anda yakin untuk menghapus voucher ini?</ModalHeader>
-        <ModalBody>          
-          <Row>
-            <Col xs={5}>Nama Voucher</Col>
-            <Col xs={7}>{": " + selectedUser.nama_voucher}</Col>
-          </Row>
-          <Row>
-            <Col xs={5}>Deskripsi</Col>
-            <Col xs={7}>{": " + selectedUser.deskripsi_voucher}</Col>
-          </Row>          
-          <Row>
-            <Col xs={5}>Pembayaran Minimal</Col>
-            <Col xs={7}>{": " + selectedUser.minimal_pay}</Col>
-          </Row>
-          <Row>
-            <Col xs={5}>Nilai Diskon</Col>
-            <Col xs={7}>{": " + selectedUser.discount_value}</Col>
-          </Row>
-          <Row>
-            <Col xs={5}>Kuota</Col>
-            <Col xs={7}>{": " + selectedUser.kuota_voucher}</Col>
-          </Row>
-          <Row>
-            <Col xs={5}>Kode Voucher</Col>
-            <Col xs={7}>{": " + selectedUser.kode_voucher}</Col>
-          </Row>          
-          <Row>
-            <Col xs={5}>Tanggal Berlaku</Col>
-            {selectedUser.time_start != '' ?
-              <Col xs={7}>{": " + moment(selectedUser.time_start).format('DD-MM-YYYY')}</Col>
-              :
-              <Col xs={7}>{": " + selectedUser.time_start}</Col>
-            }
-          </Row>
-          <Row>
-            <Col xs={5}>Tanggal Berakhir</Col>
-            {selectedUser.time_end != '' ?
-              <Col xs={7}>{": " + moment(selectedUser.time_end).format('DD-MM-YYYY')}</Col>
-              :
-              <Col xs={7}>{": " + selectedUser.time_end}</Col>
-            }
-          </Row>
-          <Row>
-            <Col xs={5}>Status Voucher</Col>
-            <Col xs={7}>{": " + selectedUser.status_voucher}</Col>
-          </Row>         
-        </ModalBody>
-        <ModalFooter>
-          <Button color="danger" onClick={deleteHandler}>Delete</Button>
-          <Button color="secondary" onClick={toggleDelete}>Tutup</Button>
-        </ModalFooter>
-      </Modal>
       <Card>
         <CardBody>
-          <CardTitle>Daftar Voucher</CardTitle>
-          <Button color = "primary" onClick = {() => {history.push('voucher/edit')} }>+ Tambah Voucher</Button>
+          <CardTitle>Daftar Customer</CardTitle>
+          {/* <Button color = "primary" onClick = {() => {history.push('gerai/edit')} }>+ Tambah Gerai</Button> */}
           <div className="my-2">
             <Label>Search</Label>
-            <Input className="m-0" type="search" placeholder="Nama, Email, No.HP" innerRef={searchRef} />
+            <Input className="m-0" type="search" placeholder="Nama, Alamat, Nomor telepon, Email" innerRef={searchRef} />
             <Button onClick={handleSearch} color="primary" className="mt-2">
               <FontAwesomeIcon icon={['fas', 'search']} />
               <span style={{ marginLeft: 10 }}>
@@ -309,7 +278,7 @@ export default function ListPendaftar() {
           </div>
           <BootstrapTable
             remote
-            keyField='id_voucher'
+            keyField='id_tipe'
             data={users}
             columns={columns}
             // selectRow={selectRow}
@@ -322,7 +291,7 @@ export default function ListPendaftar() {
               totalSize
             })}
             onTableChange={handleTableChange}
-            noDataIndication="Belum ada pendaftar"
+            noDataIndication="Belum ada customer"
             wrapperClasses="table-responsive"
           />
         </CardBody>

@@ -153,21 +153,6 @@ export default function ListPendaftar() {
       })
   }
 
-  function getDetailRegister(id) {
-    toast.dismiss();
-    axios.post('/b/o/master/registered/period', JSON.stringify({ id: id })).then(res => res.data)
-      .then(data => {
-        // console.log("period", data);
-        setPeriod(data.data);
-      }).catch(error => {
-        // if (!error.response) {
-        //   alert(error)
-        //   return
-        // }
-        toast.error(Errormsg['500'], { containerId: 'B', transition: Zoom });
-      })
-  }
-
   useEffect(() => {
     getApiKey().then((key) => {
       if(key.status){
@@ -277,106 +262,6 @@ export default function ListPendaftar() {
           <Button color="secondary" onClick={toggle}>Tutup</Button>
         </ModalFooter>
       </Modal>
-      <Modal zIndex={2000} centered isOpen={toDelete} toggle={toggleDelete}>
-        <ModalHeader toggle={toggleDelete}>Apakah anda yakin untuk menghapus tipe menu ini?</ModalHeader>
-        {/* <ModalBody>
-          <Row>
-            <Col xs={4}>Nama</Col>
-            <Col xs={8}>{": " + selectedUser.fullname}</Col>
-          </Row>
-          <Row>
-            <Col xs={4}>Email</Col>
-            <Col xs={8}>{": " + selectedUser.email}</Col>
-          </Row>
-          <Row>
-            <Col xs={4}>Jenis Kelamin</Col>
-            <Col xs={8}>: {selectedUser.gender == 'Male' ? 'Laki-laki' : 'Perempuan'}</Col>
-          </Row>
-          <Row>
-            <Col xs={4}>No HP</Col>
-            <Col xs={8}>{": " + selectedUser.mobile}</Col>
-          </Row>
-          <Row>
-            <Col xs={4}>Tempat Lahir</Col>
-            <Col xs={8}>{": " + selectedUser.birthplace}</Col>
-          </Row>
-          <Row>
-            <Col xs={4}>Tanggal Lahir</Col>
-            {selectedUser.birthdate != '' ?
-              <Col xs={8}>{": " + moment(selectedUser.birthdate).format('DD-MM-YYYY')}</Col>
-              :
-              <Col xs={8}>{": " + selectedUser.birthdate}</Col>
-            }
-          </Row>
-          <hr />
-          <Row>
-            <Col xs={4}>Alamat</Col>
-            <Col xs={8}>{": " + selectedUser.address}</Col>
-          </Row>
-          <Row>
-            <Col xs={4}>Kota</Col>
-            <Col xs={8}>{": " + selectedUser.city}</Col>
-          </Row>
-          <Row>
-            <Col xs={4}>Provinsi</Col>
-            <Col xs={8}>{": " + selectedUser.province}</Col>
-          </Row>
-          <hr />
-          <Row>
-            <Col xs={4}>Sekolah</Col>
-            <Col xs={8}>{": " + selectedUser.schoolname}</Col>
-          </Row>
-          <Row>
-            <Col xs={4}>Jurusan</Col>
-            <Col xs={8}>{": " + selectedUser.major}</Col>
-          </Row>
-          {selectedUser.major == 'SMK' &&
-            <Row>
-              <Col xs={4}>Jurusan SMK</Col>
-              <Col xs={8}>{": " + selectedUser.majordetail}</Col>
-            </Row>
-          }
-          <Row>
-            <Col xs={4}>Tahun Lulus</Col>
-            <Col xs={8}>{": " + selectedUser.graduateyear}</Col>
-          </Row>
-          <hr />
-          <Row>
-            <Col xs={4}>Agama</Col>
-            <Col xs={8}>{": " + selectedUser.religion}</Col>
-          </Row>
-          <Row>
-            <Col xs={4}>Tanggal Baptis</Col>
-            {selectedUser.baptismdate != '' ?
-              <Col xs={8}>{": " + moment(selectedUser.baptismdate).format('DD-MM-YYYY')}</Col>
-              :
-              <Col xs={8}>{": " + selectedUser.baptismdate}</Col>
-            }
-          </Row>
-          <Row>
-            <Col xs={4}>Nama Gereja</Col>
-            <Col xs={8}>{": " + selectedUser.churchname}</Col>
-          </Row>
-          <hr />
-          <Row>
-            <Col xs={4}>Total Mendaftar</Col>
-            <Col xs={8}>{": " + selectedUser.regcount}</Col>
-          </Row>
-          <hr />
-          <Row>
-            <Col xs={4}>Foto</Col>
-            <Col xs={8}>
-              {selectedUser.profilepicture != '' &&
-                <img style={{ maxWidth: 200, maxHeight: 200 }} src={urlConfig.urlBackendProfile + selectedUser.profilepicture} />
-              }
-            </Col>
-          </Row>
-        </ModalBody> */}
-        <ModalFooter>
-          <Button color="danger" onClick={deleteHandler}>Delete</Button>
-          <Button color="secondary" onClick={toggleDelete}>Tutup</Button>
-        </ModalFooter>
-      </Modal>
       <Card>
         <CardBody>
           <CardTitle>Daftar Gerai</CardTitle>
@@ -406,7 +291,7 @@ export default function ListPendaftar() {
               totalSize
             })}
             onTableChange={handleTableChange}
-            noDataIndication="Belum ada pendaftar"
+            noDataIndication="Belum ada gerai"
             wrapperClasses="table-responsive"
           />
         </CardBody>

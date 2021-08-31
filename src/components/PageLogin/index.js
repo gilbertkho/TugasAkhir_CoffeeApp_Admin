@@ -26,7 +26,7 @@ export default function LivePreviewExample() {
   const [_isMounted, setIsMounted] = useState(false);
 
   useEffect(() => {
-    setIsMounted(true);    
+    setIsMounted(true);
   }, []);
 
   // eslint-disable-next-line
