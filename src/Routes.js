@@ -29,6 +29,10 @@ const GeraiEdit = lazy(() => import('./pages/Master/Gerai/edit'));
 const CustomerList = lazy(() => import('./pages/Master/Customer'));
 const SubsList = lazy(() => import('./pages/Subscription'));
 const SubsEdit = lazy(() => import('./pages/Subscription/edit'));
+const GeraiReport = lazy(() => import('./pages/Laporan/Gerai/index'));
+const GeraiReportComplain = lazy(() => import('./pages/Laporan/Gerai/complain'));
+const GeraiReportOrder = lazy(() => import('./pages/Laporan/Gerai/order'));
+const GeraiReportTask = lazy(() => import('./pages/Laporan/Gerai/task'));
 // const TaskList = lazy(() => import('./pages/Master/Task'));
 // const TaskEdit = lazy(() => import('./pages/Master/Task/edit'));
 // const VoucherList = lazy(() => import('./pages/Master/Voucher'));
@@ -131,7 +135,7 @@ const Routes = (props) => {
               </PresentationLayout>
             </Route> */}
 
-            <Route path={['/dashboard', '/master', '/profile', '/subscription', '/withdraw']}>
+            <Route path={['/dashboard', '/master', '/profile', '/subscription', '/withdraw','/laporan']}>
               <LeftSidebar>
                 <Switch location={location} key={location.pathname}>
                   <motion.div
@@ -203,7 +207,32 @@ const Routes = (props) => {
                       roles={["Internal", "Administrator"]}
                       path="/withdraw"
                       component={Withdraw}
-                    />                    
+                    />    
+                    <PrivateRoute
+                      user={user}
+                      exact
+                      roles={["Internal", "Administrator"]}
+                      path="/laporan/gerai"
+                      component={GeraiReport}
+                    />
+                    <PrivateRoute
+                      user={user}
+                      roles={["Internal", "Administrator"]}
+                      path="/laporan/gerai/order"
+                      component={GeraiReportOrder}
+                    />
+                    <PrivateRoute
+                      user={user}
+                      roles={["Internal", "Administrator"]}
+                      path="/laporan/gerai/task"
+                      component={GeraiReportTask}
+                    />
+                    <PrivateRoute
+                      user={user}
+                      roles={["Internal", "Administrator"]}
+                      path="/laporan/gerai/complain"
+                      component={GeraiReportComplain}
+                    />
                   </motion.div>
                 </Switch>
               </LeftSidebar>

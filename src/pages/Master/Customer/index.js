@@ -59,18 +59,39 @@ export default function ListPendaftar() {
         <Button color="primary" className="mr-2" size="sm" onClick={(e) => { e.stopPropagation(); toEditUser(row) }}>
           <FontAwesomeIcon icon={['fa', 'edit']} />
         </Button>
+        <Button color="primary" className="mr-2" size="sm" onClick={(e) => { e.stopPropagation(); sendVerification(row) }}>
+          <FontAwesomeIcon icon={['fa', 'envelope']} />
+        </Button>
         {/* <Button color="danger" className="mr-2" size="sm" onClick={(e) => { e.stopPropagation(); toggleDelete(row) }}>
           <FontAwesomeIcon icon={['fa', 'trash-alt']} />
         </Button> */}
       </div>
     );
   }
-  
-  const getPhotoFormat = (cell,row) =>{    
-    return (
-      <img height="150" width="150" src={urlConfig.urlBackend + "app/gerai/menu_photo/" + row.id_menu }/>
-    )
+
+  const sendVerification = (row) => {
+    toast.info('Sedang mengirim email verifikasi', {containerId:'B', transition:Zoom, autoClose:5000});
+    axios.post('/app/admin/verify/request', {
+      email: row.email,
+      apikey: param.apikey,
+      tipe_user: 'CUSTOMER'
+    }).then(({data}) => {
+      if(data.status){
+        toast.success(data.msg, {containerId:'B', transition:Zoom});
+      } 
+      else {
+        toast.error(data.msg, { containerId: 'B', transition: Zoom });
+      }
+    }).catch((error) => {      
+      if(error.response.status != 500){
+        toast.error(error.response.data.msg, {containerId:'B', transition: Zoom});
+      }
+      else{
+        toast.error(Errormsg['500'], {containerId: 'B', transition: Zoom});        
+      }
+    })
   }
+
 
   const statusFormat = (cell,row) => {
     if(row.status_gerai === 'AKTIF'){
@@ -95,11 +116,11 @@ export default function ListPendaftar() {
     text: 'Action',
     formatter: GetActionFormat,
     headerStyle: (column, colIndex) => {
-      return { width: '200px' };
+      return { width: '210px' };
     }
   }, {
     dataField: 'nama',
-    text: 'Nama Gerai'
+    text: 'Nama'
   },{
     dataField: 'alamat',
     text: 'Alamat'
@@ -107,14 +128,9 @@ export default function ListPendaftar() {
     dataField: 'no_telp',
     text: 'Nomor Telepon'
   },{
-    dataField: 'nama_pemilik',
-    text: 'Nama Pemilik'
+    dataField: 'email',
+    text: 'Email'
   },{
-    dataField: 'status_gerai',
-    text: 'Status',
-    formatter: statusFormat
-  },
-  {
     dataField: 'verified',
     text: 'Verifikasi',
     formatter: statusVerifikas
@@ -138,18 +154,18 @@ export default function ListPendaftar() {
     axios.post('/app/admin/customer', param).then(({data}) => {
         console.log(data.data)
         if (data.status) {
-          setTotal(data.total)
-          setUsers(data.data)
+          setTotal(parseInt(data.total));
+          setUsers(data.data);
         } else {
           toast.error(data.msg, { containerId: 'B', transition: Zoom });
         }
       }).catch(error => {
         if(error.response.status != 500){
           toast.error(error.response.data.msg, {containerId:'B', transition: Zoom});
-        }        
+        }
         else{
           toast.error(Errormsg['500'], {containerId: 'B', transition: Zoom});        
-        }        
+        }
       })
   }
 
@@ -209,10 +225,10 @@ export default function ListPendaftar() {
   return (
     <>
       <Modal zIndex={2000} centered isOpen={modal} toggle={toggle}>
-        <ModalHeader toggle={toggle}>Detail Gerai</ModalHeader>
+        <ModalHeader toggle={toggle}>Detail Customer</ModalHeader>
         <ModalBody>
           <Row>
-            <Col xs={4}>Nama Gerai</Col>
+            <Col xs={4}>Nama</Col>
             <Col xs={8}>{": " + selectedUser.nama}</Col>
           </Row>
           <Row>
@@ -224,37 +240,12 @@ export default function ListPendaftar() {
             <Col xs={8}>: {selectedUser.no_telp}</Col>
           </Row>
           <Row>
-            <Col xs={4}>Nama Pemilik</Col>
-            <Col xs={8}>{": " + selectedUser.nama_pemilik}</Col>
-          </Row>
-          <Row>
             <Col xs={4}>Email</Col>
             <Col xs={8}>{": " + selectedUser.email}</Col>
-          </Row>
-          <Row>
-            <Col xs={4}>Saldo</Col>
-            <Col xs={8}>{": " + selectedUser.saldo_gerai}</Col>
-          </Row>         
-          <Row>
-            <Col xs={4}>Status</Col>
-            <Col xs={8}>{": " + selectedUser.status_gerai}</Col>
           </Row>          
           <Row>
             <Col xs={4}>Verifikasi</Col>
             <Col xs={8}>{": " + (selectedUser.verified === 'TRUE' ? 'Verified' : 'Unverified')}</Col>
-          </Row>
-          <Row>
-            <Col xs={4}>Masa Subscription</Col>
-            <Col xs={8}>{": " + (selectedUser.expire === 'EXPIRED' ? 'Tidak Berlangganan' : moment(selectedUser.expire).format('DD MMMM YYYY'))}</Col>
-          </Row>
-          <hr />
-          <Row>
-            <Col xs={4}>Foto / Logo Gerai</Col>
-            <Col xs={8}>
-              {selectedUser.profilepicture != '' &&
-                <img style={{ maxWidth: 200, maxHeight: 200 }} src={urlConfig.urlBackend + "app/admin/gerai_photo/" + selectedUser.foto_gerai + '/' + param.apikey} />
-              }
-            </Col>
           </Row>
         </ModalBody>
         <ModalFooter>
@@ -278,7 +269,7 @@ export default function ListPendaftar() {
           </div>
           <BootstrapTable
             remote
-            keyField='id_tipe'
+            keyField='id_customer'
             data={users}
             columns={columns}
             // selectRow={selectRow}

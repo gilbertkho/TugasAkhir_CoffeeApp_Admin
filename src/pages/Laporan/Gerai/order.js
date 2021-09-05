@@ -24,10 +24,15 @@ export default function ListPendaftar() {
   let [page, setPage] = useState(1);
   const sizePerPage = 10;
   const searchRef = useRef();
+  const [apikey, setApikey] = useState('');
+  const [timeStart, setTimeStart] = useState('');
+  const [timeEnd, setTimeEnd] = useState('');
   const [param, setParam] = useState({
     page: 1,
     count: sizePerPage,
     search: '',
+    time_start: '',
+    time_end: '',
     apikey: '',
   });
 
@@ -56,12 +61,12 @@ export default function ListPendaftar() {
         <Button color="primary" className="mr-2" size="sm" onClick={(e) => { e.stopPropagation(); toggleEdit(row) }}>
           <FontAwesomeIcon icon={['fa', 'info-circle']} />
         </Button>
-        <Button color="primary" className="mr-2" size="sm" onClick={(e) => { e.stopPropagation(); toEditUser(row) }}>
+        {/* <Button color="primary" className="mr-2" size="sm" onClick={(e) => { e.stopPropagation(); toEditUser(row) }}>
           <FontAwesomeIcon icon={['fa', 'edit']} />
         </Button>
         <Button color="primary" className="mr-2" size="sm" onClick={(e) => { e.stopPropagation(); sendVerification(row) }}>
           <FontAwesomeIcon icon={['fa', 'envelope']} />
-        </Button>
+        </Button> */}
         {/* <Button color="danger" className="mr-2" size="sm" onClick={(e) => { e.stopPropagation(); toggleDelete(row) }}>
           <FontAwesomeIcon icon={['fa', 'trash-alt']} />
         </Button> */}
@@ -69,83 +74,69 @@ export default function ListPendaftar() {
     );
   }
 
-  const sendVerification = (row) => {
-    toast.info('Sedang mengirim email verifikasi', {containerId:'B', transition:Zoom, autoClose:5000});
-    axios.post('/app/admin/verify/request', {
-      email: row.email,
-      apikey: param.apikey,
-      tipe_user: 'GERAI'
-    }).then(({data}) => {
-      if(data.status){
-        toast.success(data.msg, {containerId:'B', transition:Zoom});
-      } 
-      else {
-        toast.error(data.msg, { containerId: 'B', transition: Zoom });
-      }
-    }).catch((error) => {      
-      if(error.response.status != 500){
-        toast.error(error.response.data.msg, {containerId:'B', transition: Zoom});
-      }
-      else{
-        toast.error(Errormsg['500'], {containerId: 'B', transition: Zoom});        
-      }
-    })
+  const setNumberFormat = (cell,row) =>{
+    if(row.total_harga){
+      return (
+        <>{addCommas(row.total_harga)}</>
+      )
+    }    
   }
 
-  
-  const getPhotoFormat = (cell,row) =>{    
-    return (
-      <img height="150" width="150" src={urlConfig.urlBackend + "app/gerai/menu_photo/" + row.id_menu }/>
+  const timeFormat = (cell,row) =>{
+    let date = new Date(row.tgl_pesanan);    
+    return(
+      <>
+        {moment(row.tgl_pesanan).format('DD MMM YYYY, H:mm')}
+      </>
     )
   }
 
-  const statusFormat = (cell,row) => {
-    if(row.status_gerai === 'AKTIF'){
-      return <p className = 'text-success font-weight-bold m-0'>{row.status_gerai}</p>
-    }
-    else{
-      return <p className = 'text-warning font-weight-bold m-0'>{row.status_gerai}</p>
-    }
+  const statusPesanan  = (cell,row) => {
+    return(
+      <>
+        {row.status_pesanan === 'DIPROSES' ? 
+            <p className = 'text-warning m-0 font-weight-bold'>{row.status_pesanan}</p> 
+          : row.status_pesanan === 'SELESAI' ?        
+            <p className = 'text-success m-0 font-weight-bold'>{row.status_pesanan}</p> 
+          : <p className = 'text-info m-0 font-weight-bold'>{row.status_pesanan}</p>
+        } 
+      </>
+    )
   }
 
-  const statusVerifikas = (cell, row) => {
-    if(row.verified === 'TRUE'){
-      return <p className = 'text-info font-weight-bold m-0'>Verified</p>
-    }
-    else{
-      return <p className = 'text-danger font-weight-bold m-0'>Unverified</p>
-    }
-  }
+  const addCommas = (num) => {
+    return num.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+  };
 
   const columns = [{
     dataField: 'action',
     text: 'Action',
     formatter: GetActionFormat,
     headerStyle: (column, colIndex) => {
-      return { width: '210px' };
+      return { width: '100px' };
     }
   }, {
     dataField: 'nama',
     text: 'Nama Gerai'
+  }, {
+    dataField: 'nama_pelanggan',
+    text: 'Nama Pelanggan'
+  }, {
+    dataField: 'waktu_pesanan',
+    text: 'Tanggal Pesanan',
+    formatter : timeFormat
+  }, {
+    dataField: 'total_pesanan',
+    text: 'Jumlah Pesanan'
+  }, {
+    dataField: 'total_harga',
+    text: 'Total Harga',
+    formatter: setNumberFormat
   },{
-    dataField: 'alamat',
-    text: 'Alamat'
-  },{
-    dataField: 'no_telp',
-    text: 'Nomor Telepon'
-  },{
-    dataField: 'nama_pemilik',
-    text: 'Nama Pemilik'
-  },{
-    dataField: 'status_gerai',
-    text: 'Status',
-    formatter: statusFormat
-  },
-  {
-    dataField: 'verified',
-    text: 'Verifikasi',
-    formatter: statusVerifikas
-  },];
+    dataField: 'status_pesanan',
+    text: 'Status Pesanan',
+    formatter: statusPesanan
+  }];
 
   const selectRow = {
     mode: 'checkbox',
@@ -162,30 +153,31 @@ export default function ListPendaftar() {
 
   function fetchData(param) { 
     console.log(param)
-    axios.post('/app/admin/gerai', param).then(({data}) => {
-        console.log(data.data)
+    axios.post('/app/admin/report/gerai/detail/order', param).then(({data}) => {
+        console.log(data)
         if (data.status) {
           setTotal(parseInt(data.total));
           setUsers(data.data);
         } else {
           toast.error(data.msg, { containerId: 'B', transition: Zoom });
         }
-      }).catch(error => {
+      }).catch(error => {        
         if(error.response.status != 500){
           toast.error(error.response.data.msg, {containerId:'B', transition: Zoom});
         }        
         else{
           toast.error(Errormsg['500'], {containerId: 'B', transition: Zoom});        
-        }        
+        }
       })
   }
 
   useEffect(() => {
     getApiKey().then((key) => {
       if(key.status){
+        setApikey(key.key);
         setParam({...param, apikey: key.key});
       }
-    })
+    })    
   },[])
 
   useEffect(() => {
@@ -201,87 +193,76 @@ export default function ListPendaftar() {
     }))
   }
 
-  const deleteHandler = async () => {
-    toast.dismiss();
-    axios.post('app/admin/gerai/delete', {id_tipe: selectedUser.id_tipe}).then(({data}) => {
-        if (data.status) {
-          // if (page == 1) {
-          //   fetchData(1, sizePerPage);
-          // } else {
-          //   setPage(1);
-          // }
-          toast.success(data.msg, {containerId:"B", transition:Zoom});
-          fetchData(param);
-          toggleDelete({});
-        }
-        else{
-          toast.error(data.msg, {containerId:"B", transition:Zoom});
-        }
-      })
-    .catch(error => { 
-      if(error.response.status != 500){
-        toast.error(error.response.data.msg, {containerId:'B', transition: Zoom});
-      }        
-      else{
-        toast.error(Errormsg['500'], {containerId: 'B', transition: Zoom});        
-      }      
-    })
+  const clearSearch = () => {
+    setTimeStart('');
+    setTimeEnd('');
+    setParam((prevState) => ({ ...prevState, page: 1, time_start: '', time_end: '' }));    
+  }
+
+  const setTimeFilter = (e,val) => {
+    if(val === "ts"){
+      setTimeStart(e.target.value)      
+    }
+    else{
+      setTimeEnd(e.target.value)     
+    }
+    console.log(e.target.value)
   }
 
   const handleSearch = (e) => {
-    e.preventDefault()
-    setParam((prevState) => ({ ...prevState, page: 1, search: searchRef.current.value }))
+    e.preventDefault();
+    if(Date.parse(timeStart) >  Date.parse(timeEnd)){
+      toast.error('Tanggal berlaku tidak boleh melebihi tanggal berakhir', { containerId: 'B', transition: Zoom });
+    }
+    else{      
+      setParam((prevState) => ({ ...prevState, page: 1, search: searchRef.current.value, time_start: timeStart, time_end: timeEnd, apikey: apikey }));
+    }    
   }
 
   return (
     <>
       <Modal zIndex={2000} centered isOpen={modal} toggle={toggle}>
-        <ModalHeader toggle={toggle}>Detail Gerai</ModalHeader>
+      <ModalHeader toggle={toggle}>Detail Pesanan</ModalHeader>
         <ModalBody>
           <Row>
-            <Col xs={4}>Nama Gerai</Col>
-            <Col xs={8}>{": " + selectedUser.nama}</Col>
+            <Col xs={4}>ID Pesanan</Col>
+            <Col xs={8}>{": " + selectedUser.id_pesanan}</Col>
           </Row>
           <Row>
-            <Col xs={4}>Alamat</Col>
-            <Col xs={8}>{": " + selectedUser.alamat}</Col>
+            <Col xs={4}>Nama Pelanggan</Col>
+            <Col xs={8}>{": " + selectedUser.nama_pelanggan}</Col>
           </Row>
           <Row>
-            <Col xs={4}>Nomor Telepon</Col>
-            <Col xs={8}>: {selectedUser.no_telp}</Col>
+            <Col xs={4}>Tanggal Pesanan</Col>
+            <Col xs={8}>{": " + moment(selectedUser.tgl_pesanan).format('DD MMMM YYYY, H:mm')}</Col>
           </Row>
           <Row>
-            <Col xs={4}>Nama Pemilik</Col>
-            <Col xs={8}>{": " + selectedUser.nama_pemilik}</Col>
+            <Col xs={4}>Jumlah Pesanan</Col>
+            <Col xs={8}>{": " + selectedUser.total_pesanan}</Col>
           </Row>
           <Row>
-            <Col xs={4}>Email</Col>
-            <Col xs={8}>{": " + selectedUser.email}</Col>
+            <Col xs={4}>Total Harga</Col>
+            <Col xs={8}>{modal ? ": " + addCommas(selectedUser.total_harga) : ": " + selectedUser.total_harga}</Col>
           </Row>
           <Row>
-            <Col xs={4}>Saldo</Col>
-            <Col xs={8}>{": " + selectedUser.saldo_gerai}</Col>
-          </Row>         
-          <Row>
-            <Col xs={4}>Status</Col>
-            <Col xs={8}>{": " + selectedUser.status_gerai}</Col>
-          </Row>          
-          <Row>
-            <Col xs={4}>Verifikasi</Col>
-            <Col xs={8}>{": " + (selectedUser.verified === 'TRUE' ? 'Verified' : 'Unverified')}</Col>
+            <Col xs={4}>Pengambilan</Col>
+            <Col xs={8}>{": " + selectedUser.tipe_pengambilan}</Col>
           </Row>
           <Row>
-            <Col xs={4}>Masa Subscription</Col>
-            <Col xs={8}>{": " + (selectedUser.expire === 'EXPIRED' ? 'Tidak Berlangganan' : moment(selectedUser.expire).format('DD MMMM YYYY'))}</Col>
+            <Col xs={4}>Biaya Delivery</Col>
+            <Col xs={8}>{modal ? ": " + addCommas(selectedUser.biaya_delivery): ": " + selectedUser.biaya_delivery}</Col>
           </Row>
-          <hr />
           <Row>
-            <Col xs={4}>Foto / Logo Gerai</Col>
-            <Col xs={8}>
-              {selectedUser.profilepicture != '' &&
-                <img style={{ maxWidth: 200, maxHeight: 200 }} src={urlConfig.urlBackend + "app/admin/gerai_photo/" + selectedUser.foto_gerai + '/' + param.apikey} />
-              }
-            </Col>
+            <Col xs={4}>Voucher</Col>
+            <Col xs={8}>{": " + (selectedUser.nama_voucher !== 'undefined' ? selectedUser.nama_voucher : 'Tidak menggunakan voucher apapun' )}</Col>
+          </Row>
+          <Row>
+            <Col xs={4}>Status Pesanan</Col>
+            <Col xs={8}>{": " + selectedUser.status_pesanan}</Col>
+          </Row>
+          <Row>
+            <Col xs={4}>Catatan Tambahan</Col>
+            <Col xs={8}>{": " + selectedUser.catatan_tambahan}</Col>
           </Row>
         </ModalBody>
         <ModalFooter>
@@ -291,11 +272,31 @@ export default function ListPendaftar() {
       </Modal>
       <Card>
         <CardBody>
-          <CardTitle>Daftar Gerai</CardTitle>
+          <CardTitle>Laporan Pemesanan</CardTitle>
           {/* <Button color = "primary" onClick = {() => {history.push('gerai/edit')} }>+ Tambah Gerai</Button> */}
+            <div className = 'd-flex'>
+              <div className = "w-50">
+                <Label for = "time_start">Mulai Dari</Label>
+                <Input id = "time_start" type="date" value = {timeStart} onChange = {(e) => setTimeFilter(e,"ts")}/>
+              </div>
+              <div className = "w-50 pl-3">
+                <Label for = "time_end">Hingga</Label>
+                <Input id = "time_end" type="date" value = {timeEnd} onChange = {(e) => setTimeFilter(e,"te")}/>
+              </div>
+            </div>
+            {
+              timeStart !== '' || timeEnd !== '' ? 
+              <Button onClick={clearSearch} color="info" className="mt-2">
+                <FontAwesomeIcon icon={['fas', 'trash-alt']} />
+                <span style={{ marginLeft: 10 }}>
+                  Clear
+                </span>
+              </Button>
+              : null
+            }
           <div className="my-2">
             <Label>Search</Label>
-            <Input className="m-0" type="search" placeholder="Nama, Alamat, Nomor telepon, Nama Pemilik, Email" innerRef={searchRef} />
+            <Input className="m-0" type="search" placeholder="Nama" innerRef={searchRef} />
             <Button onClick={handleSearch} color="primary" className="mt-2">
               <FontAwesomeIcon icon={['fas', 'search']} />
               <span style={{ marginLeft: 10 }}>

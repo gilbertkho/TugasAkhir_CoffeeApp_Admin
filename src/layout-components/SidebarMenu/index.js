@@ -19,6 +19,7 @@ import {
   Shield,
   Database,
   Calendar,
+  PieChart,
   Clipboard,
   Settings,
   Layout,
@@ -35,30 +36,17 @@ const SidebarMenu = (props) => {
   const toggleSidebarMobile = () => setSidebarToggleMobile(false);
 
   const [masterOpen, setMasterOpen] = useState(false);
-  const [masterPsikotesOpen, setMasterPsikotesOpen] = useState(false);
-  const [masterUjianOpen, setMasterUjianOpen] = useState(false);
-  const [staticOpen, setStatic] = useState(false);
-  const [level2Open, setLevel2Open] = useState(false);
+  const [laporanOpen, setLaporanOpen] = useState(false);  
   const [user, setUser] = useState(null);
   const [mounted, setMounted] = useState(false);
+
   const toggleMaster = (event) => {
     setMasterOpen(!masterOpen);
     event.preventDefault();
   };
-  const toggleMasterPsikotes = (event) => {
-    setMasterPsikotesOpen(!masterPsikotesOpen);
-    event.preventDefault();
-  };
-  const toggleMasterUjian = (event) => {
-    setMasterUjianOpen(!masterUjianOpen);
-    event.preventDefault();
-  };
-  const toggleStatic = (event) => {
-    setStatic(!staticOpen);
-    event.preventDefault();
-  };
-  const toggleLevel2 = (event) => {
-    setLevel2Open(!level2Open);
+
+  const toggleLaporan = (event) => {
+    setLaporanOpen(!laporanOpen);
     event.preventDefault();
   };
 
@@ -152,70 +140,7 @@ const SidebarMenu = (props) => {
                         to="/master/customer">
                         Customer
                       </NavLink>
-                    </li>
-                    {/* <li>
-                      <NavLink
-                        onClick={toggleSidebarMobile}
-                        to="/master/menu">
-                        Menu
-                      </NavLink>
-                    </li>
-                    <li>
-                      <NavLink
-                        onClick={toggleSidebarMobile}
-                        to="/master/task">
-                        Task
-                      </NavLink>
-                    </li>
-                    <li>
-                      <NavLink
-                        onClick={toggleSidebarMobile}
-                        to="/master/voucher">
-                        Voucher
-                      </NavLink>
-                    </li> */}
-                    {/* <li>
-                      <NavLink
-                        onClick={toggleSidebarMobile}
-                        to="/master/user/list">
-                        User
-                    </NavLink>
-                    </li>                    
-                    <li>
-                      <NavLink
-                        onClick={toggleSidebarMobile}
-                        to="/master/pendaftaran">
-                        Pendaftaran
-                    </NavLink>
-                    </li>
-                    <li>
-                      <NavLink
-                        onClick={toggleSidebarMobile}
-                        to="/master/period">
-                        Periode
-                    </NavLink>
-                    </li>
-                    <li>
-                      <NavLink
-                        onClick={toggleSidebarMobile}
-                        to="/master/school">
-                        School
-                    </NavLink>
-                    </li>
-                    <li>
-                      <NavLink
-                        onClick={toggleSidebarMobile}
-                        to="/master/syarat">
-                        Syarat Administrasi
-                    </NavLink>
-                    </li>
-                    <li>
-                      <NavLink
-                        onClick={toggleSidebarMobile}
-                        to="/master/file">
-                        File Download
-                    </NavLink>
-                    </li> */}
+                    </li>                  
                   </ul>
                 </Collapse>
               </li>
@@ -249,261 +174,33 @@ const SidebarMenu = (props) => {
                   </span>
                 </NavLink>
               </li>
-              {/* <li>
-                <div className="d-sm-block text-white py-2 mx-2 border-bottom border-dark">
-                    <div className="d-sm-block mx-2">Tahap II Administrasi</div>
-                </div>
-              </li>
-              <li>
-                <NavLink
-                  activeClassName="active"
-                  onClick={toggleSidebarMobile}
-                  className="nav-link-simple"
-                  to="/tahap2">
-                  <span className="sidebar-icon">
-                    <Shield />
-                  </span>
-                Administrasi
-                <span className="sidebar-icon-indicator sidebar-icon-indicator-right">
-                    <ChevronRight />
-                  </span>
-                </NavLink>
-              </li>
-              <li>
-                <div className="d-sm-block text-white py-2 mx-2 border-bottom border-dark">
-                    <div className="d-sm-block mx-2">Tahap III Ujian</div>
-                </div>
-              </li>              
               <li>
                 <a
                   href="#/"
-                  onClick={toggleMasterUjian}
-                  className={clsx({ active: masterUjianOpen })}>
+                  onClick={toggleLaporan}
+                  className={clsx({ active: laporanOpen })}>
                   <span className="sidebar-icon">
-                    <Clipboard />
+                    <PieChart/>
                   </span>
-                  <span className="sidebar-item-label">Master Ujian</span>
+                  <span className="sidebar-item-label">Laporan</span>
                   <span className="sidebar-icon-indicator">
-                    <ChevronRight />
+                    <ChevronRight/>
                   </span>
                 </a>
-                <Collapse isOpen={masterUjianOpen}>
+                <Collapse isOpen={laporanOpen}>
                   <ul>
                     <li>
                       <NavLink
                         onClick={toggleSidebarMobile}
-                        to="/master/ujian/kategori">
-                        Kategori Ujian
-                    </NavLink>
-                    </li>
-                    <li>
-                      <NavLink
-                        onClick={toggleSidebarMobile}
-                        to="/master/ujian/soal">
-                        Soal Ujian
-                    </NavLink>
-                    </li>
+                        to="/laporan/gerai">
+                        Gerai
+                      </NavLink>
+                    </li>                    
                   </ul>
                 </Collapse>
               </li>
-              <li> */}
-                {/* <NavLink
-                  activeClassName="active"
-                  onClick={toggleSidebarMobile}
-                  className="nav-link-simple"
-                  to="/master/ujian/setting">
-                  <span className="sidebar-icon">
-                    <Settings />
-                  </span>
-                Ujian Setting
-                <span className="sidebar-icon-indicator sidebar-icon-indicator-right">
-                    <ChevronRight />
-                  </span>
-                </NavLink>
-              </li> */}
-              {/* <li>
-                <NavLink
-                  activeClassName="active"
-                  onClick={toggleSidebarMobile}
-                  className="nav-link-simple"
-                  to="/tahap2">
-                  <span className="sidebar-icon">
-                    <Shield />
-                  </span>
-                <span className="sidebar-icon-indicator sidebar-icon-indicator-right">
-                  <ChevronRight />
-                </span> 
-              </NavLink>
-              </li> */}
-              {/* <li>
-                <NavLink
-                  activeClassName="active"
-                  onClick={toggleSidebarMobile}
-                  className="nav-link-simple"
-                  to="/master/ujian/hasil">
-                  <span className="sidebar-icon">
-                    <CheckSquare />
-                  </span>
-                Hasil Ujian
-                <span className="sidebar-icon-indicator sidebar-icon-indicator-right">
-                    <ChevronRight />
-                  </span>
-                </NavLink>
-              </li>
-              <li>
-                <a
-                  href="#/"
-                  onClick={toggleMasterPsikotes}
-                  className={clsx({ active: masterPsikotesOpen })}>
-                  <span className="sidebar-icon">
-                    <Clipboard />
-                  </span>
-                  <span className="sidebar-item-label">Master Psikotes</span>
-                  <span className="sidebar-icon-indicator">
-                    <ChevronRight />
-                  </span>
-                </a>
-                <Collapse isOpen={masterPsikotesOpen}>
-                  <ul>
-                    <li>
-                      <NavLink
-                        onClick={toggleSidebarMobile}
-                        to="/master/userpsikotes/list">
-                        User Psikotes
-                    </NavLink>
-                    </li>
-                    <li>
-                      <NavLink
-                        onClick={toggleSidebarMobile}
-                        to="/psikotes/export">
-                        Export Data Peserta Psikotes
-                    </NavLink>
-                    </li>
-                    <li>
-                      <NavLink
-                        onClick={toggleSidebarMobile}
-                        to="/master/aspekpsikotes/list">
-                        Master Aspek
-                    </NavLink>
-                    </li>
-                  </ul>
-                </Collapse>
-              </li>
-              <li> */}
-                {/* <NavLink
-                  activeClassName="active"
-                  onClick={toggleSidebarMobile}
-                  className="nav-link-simple"
-                  to="/psikotes">
-                  <span className="sidebar-icon">
-                    <List />
-                  </span>
-                Daftar ujian Psikotes
-                <span className="sidebar-icon-indicator sidebar-icon-indicator-right">
-                    <ChevronRight />
-                  </span>
-                </NavLink>
-              </li> */}
-              {/* <li>
-              <NavLink
-                activeClassName="active"
-                onClick={toggleSidebarMobile}
-                className="nav-link-simple"
-                to="/master/ujian/request">
-                <span className="sidebar-icon">
-                  <Clipboard />
-                </span>
-                Request Ujian
-                <span className="sidebar-icon-indicator sidebar-icon-indicator-right">
-                  <ChevronRight />
-                </span> 
-              </NavLink>
-            </li> */}
-             {/* <li>
-                <div className="d-sm-block text-white py-2 mx-2 border-bottom border-dark">
-                    <div className="d-sm-block mx-2">Tahap IV Unggah Berkas</div>
-                </div>
-              </li>
-              <li>
-                <NavLink
-                  activeClassName="active"
-                  onClick={toggleSidebarMobile}
-                  className="nav-link-simple"
-                  to="/tahap4">
-                  <span className="sidebar-icon">
-                    <Briefcase />
-                  </span>
-                Unggah Berkas
-                <span className="sidebar-icon-indicator sidebar-icon-indicator-right">
-                    <ChevronRight />
-                  </span>
-                </NavLink>
-              </li>
-            <li>
-                <div className="d-sm-block text-white py-2 mx-2 border-bottom border-dark">
-                    <div className="d-sm-block mx-2">Statis</div>
-                </div>
-              </li>
-              <li>
-                <a
-                  href="#/"
-                  onClick={toggleStatic}
-                  className={clsx({ active: staticOpen })}>
-                  <span className="sidebar-icon">
-                    <Layout />
-                  </span>
-                  <span className="sidebar-item-label">Statis</span>
-                  <span className="sidebar-icon-indicator">
-                    <ChevronRight />
-                  </span>
-                </a>
-                <Collapse isOpen={staticOpen}>
-                  <ul>
-                    <li>
-                      <NavLink
-                        onClick={toggleSidebarMobile}
-                        to="/static/timeline">
-                        Timeline
-                    </NavLink>
-                    </li>
-                    <li>
-                      <NavLink
-                        onClick={toggleSidebarMobile}
-                        to="/static/tatib">
-                        Tata Tertib Ujian
-                    </NavLink>
-                    </li>
-                    <li>
-                      <NavLink
-                        onClick={toggleSidebarMobile}
-                        to="/static/alamatdokumen">
-                        Alamat Pengiriman Dokumen
-                    </NavLink>
-                    </li>
-                  </ul>
-                </Collapse>
-              </li> */}
             </ul>
           }
-          {/* {(user && user.tu == 'Psikotes') &&
-            <ul>
-              <li>
-                <NavLink
-                  activeClassName="active"
-                  onClick={toggleSidebarMobile}
-                  className="nav-link-simple"
-                  to="/psikotes">
-                  <span className="sidebar-icon">
-                    <List />
-                  </span>
-                Daftar Psikotes
-                <span className="sidebar-icon-indicator sidebar-icon-indicator-right">
-                    <ChevronRight />
-                  </span>
-                </NavLink>
-              </li>
-            </ul>
-          } */}
         </div>
       </PerfectScrollbar>
     </>

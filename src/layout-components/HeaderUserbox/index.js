@@ -130,11 +130,11 @@ const HeaderUserbox = (props) => {
                     </UncontrolledTooltip>
                   </div> */}
                 </NavItem>
-                <NavItem>
+                {/* <NavItem>
                   <NavLinkStrap href="#/" onClick={(e) => { e.preventDefault(); goToProfile() }}>
                     My Account
                   </NavLinkStrap>
-                </NavItem>
+                </NavItem> */}
                 <NavItem>
                   <NavLinkStrap href="#/" onClick={(e) => { e.preventDefault(); logOut() }}>
                     Logout
