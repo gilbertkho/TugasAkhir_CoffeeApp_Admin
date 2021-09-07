@@ -4,7 +4,7 @@ import React, { Fragment, useState, useEffect, useRef } from 'react';
 import { useHistory } from 'react-router-dom';
 import {
   Card, CardTitle, CardBody, Button, Modal, ModalHeader,
-  ModalBody, ModalFooter, Row, Col, Label, Input, Table
+  ModalBody, ModalFooter, Row, Col, Label, Input, Table, Breadcrumb, BreadcrumbItem
 } from 'reactstrap';
 import BootstrapTable from 'react-bootstrap-table-next';
 import paginationFactory from 'react-bootstrap-table2-paginator';
@@ -290,7 +290,11 @@ export default function ListPendaftar() {
       </Modal>
       <Card>
         <CardBody>
-          <CardTitle>Laporan Komplain</CardTitle>
+          {/* <CardTitle>Laporan Komplain</CardTitle> */}
+          <Breadcrumb>
+            <BreadcrumbItem><a href="/#" onClick={(e) => { e.preventDefault(); history.push('/laporan/gerai') }}>Laporan</a></BreadcrumbItem>
+            <BreadcrumbItem active>Komplain</BreadcrumbItem>
+          </Breadcrumb>
           {/* <Button color = "primary" onClick = {() => {history.push('gerai/edit')} }>+ Tambah Gerai</Button> */}
             <div className = 'd-flex'>
               <div className = "w-50">
@@ -314,7 +318,7 @@ export default function ListPendaftar() {
             }
           <div className="my-2">
             <Label>Search</Label>
-            <Input className="m-0" type="search" placeholder="Nama" innerRef={searchRef} />
+            <Input className="m-0" type="search" placeholder="Nama Gerai, Nama Pelanggan" innerRef={searchRef} />
             <Button onClick={handleSearch} color="primary" className="mt-2">
               <FontAwesomeIcon icon={['fas', 'search']} />
               <span style={{ marginLeft: 10 }}>

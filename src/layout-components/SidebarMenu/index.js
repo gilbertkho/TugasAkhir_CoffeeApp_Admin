@@ -175,7 +175,20 @@ const SidebarMenu = (props) => {
                 </NavLink>
               </li>
               <li>
-                <a
+                <NavLink
+                  activeClassName="active"
+                  onClick={toggleSidebarMobile}
+                  className="nav-link-simple"
+                  to="/laporan/gerai">
+                  <span className="sidebar-icon">
+                    <PieChart />
+                  </span>
+                  Laporan
+                  <span className="sidebar-icon-indicator sidebar-icon-indicator-right">
+                    <ChevronRight/>
+                  </span>
+                </NavLink>
+                {/* <a
                   href="#/"
                   onClick={toggleLaporan}
                   className={clsx({ active: laporanOpen })}>
@@ -197,7 +210,7 @@ const SidebarMenu = (props) => {
                       </NavLink>
                     </li>                    
                   </ul>
-                </Collapse>
+                </Collapse> */}
               </li>
             </ul>
           }

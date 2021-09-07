@@ -27,12 +27,14 @@ const Withdraw = lazy(() => import('./pages/Withdraw/withdraw'));
 const GeraiList = lazy(() => import('./pages/Master/Gerai'));
 const GeraiEdit = lazy(() => import('./pages/Master/Gerai/edit'));
 const CustomerList = lazy(() => import('./pages/Master/Customer'));
+const CustomerEdit = lazy(() => import('./pages/Master/Customer/edit'));
 const SubsList = lazy(() => import('./pages/Subscription'));
 const SubsEdit = lazy(() => import('./pages/Subscription/edit'));
 const GeraiReport = lazy(() => import('./pages/Laporan/Gerai/index'));
 const GeraiReportComplain = lazy(() => import('./pages/Laporan/Gerai/complain'));
 const GeraiReportOrder = lazy(() => import('./pages/Laporan/Gerai/order'));
 const GeraiReportTask = lazy(() => import('./pages/Laporan/Gerai/task'));
+const GeraiReportTaskDetail = lazy(() => import('./pages/Laporan/Gerai/taskDetail'));
 // const TaskList = lazy(() => import('./pages/Master/Task'));
 // const TaskEdit = lazy(() => import('./pages/Master/Task/edit'));
 // const VoucherList = lazy(() => import('./pages/Master/Voucher'));
@@ -175,7 +177,14 @@ const Routes = (props) => {
                       roles={["Internal", "Administrator"]}
                       path="/master/customer"
                       component={CustomerList}
-                    />                    
+                    />
+                    <PrivateRoute
+                      user={user}
+                      exact
+                      roles={["Internal", "Administrator"]}
+                      path="/master/customer/edit"
+                      component={CustomerEdit}
+                    />
                     {/* <PrivateRoute
                       user={user}
                       exact
@@ -223,6 +232,7 @@ const Routes = (props) => {
                     />
                     <PrivateRoute
                       user={user}
+                      exact
                       roles={["Internal", "Administrator"]}
                       path="/laporan/gerai/task"
                       component={GeraiReportTask}
@@ -232,6 +242,12 @@ const Routes = (props) => {
                       roles={["Internal", "Administrator"]}
                       path="/laporan/gerai/complain"
                       component={GeraiReportComplain}
+                    />
+                    <PrivateRoute
+                      user={user}
+                      roles={["Internal", "Administrator"]}
+                      path="/laporan/gerai/task/detail"
+                      component={GeraiReportTaskDetail}
                     />
                   </motion.div>
                 </Switch>

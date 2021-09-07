@@ -39,7 +39,7 @@ export default function ListPendaftar() {
     setSelectedUser(user)
   };
 
-  const toEditUser = (user) => history.push('/master/gerai/edit', { user: user });
+  const toEditUser = (user) => history.push('/master/customer/edit', { user: user });
 
   const [modal, setModal] = useState(false);
   const [selectedUser, setSelectedUser] = useState({});

@@ -4,7 +4,7 @@ import React, { Fragment, useState, useEffect, useRef } from 'react';
 import { useHistory } from 'react-router-dom';
 import {
   Card, CardTitle, CardBody, Button, Modal, ModalHeader,
-  ModalBody, ModalFooter, Row, Col, Label, Input, Table
+  ModalBody, ModalFooter, Row, Col, Label, Input, Table, Breadcrumb, BreadcrumbItem
 } from 'reactstrap';
 import BootstrapTable from 'react-bootstrap-table-next';
 import paginationFactory from 'react-bootstrap-table2-paginator';
@@ -54,6 +54,8 @@ export default function ListPendaftar() {
 
   // useEffect(() => { console.log(totalSize) }, [totalSize]);
 
+  const toReport = (user) => { history.push('/laporan/gerai/task/detail', { user: user }); }
+
   const GetActionFormat = (cell, row) => {
     console.log(row);
     return (
@@ -61,15 +63,9 @@ export default function ListPendaftar() {
         <Button color="primary" className="mr-2" size="sm" onClick={(e) => { e.stopPropagation(); toggleEdit(row) }}>
           <FontAwesomeIcon icon={['fa', 'info-circle']} />
         </Button>
-        {/* <Button color="primary" className="mr-2" size="sm" onClick={(e) => { e.stopPropagation(); toEditUser(row) }}>
-          <FontAwesomeIcon icon={['fa', 'edit']} />
+        <Button color="primary" className="mr-2" size="sm" onClick={(e) => { e.stopPropagation(); toReport(row) }}>
+          <FontAwesomeIcon icon={['fa', 'chart-line']} />
         </Button>
-        <Button color="primary" className="mr-2" size="sm" onClick={(e) => { e.stopPropagation(); sendVerification(row) }}>
-          <FontAwesomeIcon icon={['fa', 'envelope']} />
-        </Button> */}
-        {/* <Button color="danger" className="mr-2" size="sm" onClick={(e) => { e.stopPropagation(); toggleDelete(row) }}>
-          <FontAwesomeIcon icon={['fa', 'trash-alt']} />
-        </Button> */}
       </div>
     );
   }
@@ -125,7 +121,7 @@ const statusFormat = (cell,row) => {
     text: 'Action',
     formatter: GetActionFormat,
     headerStyle: (column, colIndex) => {
-      return { width: '100px' };
+      return { width: '180px' };
     }
   }, {
     dataField: 'nama',
@@ -237,8 +233,12 @@ const statusFormat = (cell,row) => {
     <>
       <Modal zIndex={2000} centered isOpen={modal} toggle={toggle}>
         <ModalHeader toggle={toggle}>Detail Task</ModalHeader>
-        <ModalBody>          
-        <Row>
+        <ModalBody>
+          <Row>
+            <Col xs={4}>ID Task</Col>
+            <Col xs={8}>{": " + selectedUser.id_task }</Col>
+          </Row>
+          <Row>
             <Col xs={4}>Level</Col>
             <Col xs={8}>{modal ? ": " + addCommas(selectedUser.level_task) : ": " + selectedUser.level_task}</Col>
           </Row>
@@ -266,7 +266,11 @@ const statusFormat = (cell,row) => {
       </Modal>
       <Card>
         <CardBody>
-          <CardTitle>Laporan Task</CardTitle>
+          {/* <CardTitle>Laporan Task</CardTitle> */}
+          <Breadcrumb>
+            <BreadcrumbItem><a href="/#" onClick={(e) => { e.preventDefault(); history.push('/laporan/gerai') }}>Laporan</a></BreadcrumbItem>
+            <BreadcrumbItem active>Task</BreadcrumbItem>
+          </Breadcrumb>
           {/* <Button color = "primary" onClick = {() => {history.push('gerai/edit')} }>+ Tambah Gerai</Button> */}
             <div className = 'd-flex'>
               <div className = "w-50">

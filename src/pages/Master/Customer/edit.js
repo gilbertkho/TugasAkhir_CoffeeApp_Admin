@@ -1,6 +1,5 @@
 /* eslint-disable */
 import React, { Fragment, useState, useEffect } from 'react';
-import default_menu from 'assets/images/default_menu/menu_gerai.png'
 import {
   Card, CardTitle, Form, FormGroup, Label, Input,
   FormFeedback, Col, Row, Button, CustomInput, InputGroup,
@@ -26,14 +25,12 @@ export default function AdminReqEditForm(props) {
   const [apikey, setApikey] = useState('');
   const history = useHistory();
   const [req, setReq] = useState({ 
-    id_gerai: "",
+    id_customer: "",
     nama: "",
     alamat: "",
-    no_telp: "",
-    nama_pemilik: "",
-    email: "",
-    saldo_gerai: "",    
-    status_gerai: "",
+    no_telp: "",    
+    email: "",    
+    status_customer: "",
     verified: "",
     apikey: apikey,
   });
@@ -45,22 +42,20 @@ export default function AdminReqEditForm(props) {
     console.log(req);
   },[req]);
   const resetReq = () => { setReq({ 
-    id_gerai: "",
+    id_customer: "",
     nama: "",
     alamat: "",
-    no_telp: "",
-    nama_pemilik: "",
-    email: "",
-    saldo_gerai: 0,    
-    status_gerai: "",
+    no_telp: "",    
+    email: "",    
+    status_customer: "",
     verified: "",
-    apikey: apikey
+    apikey: apikey,
     })
   };
 
   const [reqMajor, setReqMajor] = useState({id:"",  setupid:"", major:"", countquestion:0, setupquestion:[]});
   const [submitDisable, setSubmitDisable] = useState(false);
-  const [category, setCategory] = useState([]);  
+  const [category, setCategory] = useState([]);
   const changeSubmitDisableState = (value) => { setSubmitDisable(value) };
 
   const resetForm = () => {
@@ -68,9 +63,9 @@ export default function AdminReqEditForm(props) {
     setActionType("add");
   }
 
-  useEffect(() => {    
+  useEffect(() => {
     resetForm();
-    if (props.location.state && props.location.state.user) {      
+    if (props.location.state && props.location.state.user) {
       console.log(props.location.state)
       let propsReq = props.location.state.user;
       getApiKey().then((key) => {
@@ -78,14 +73,12 @@ export default function AdminReqEditForm(props) {
           setApikey(key.key);
           setReq({
             ...req,
-            id_gerai: propsReq.id_gerai,
+            id_customer: propsReq.id_customer,
             nama: propsReq.nama,
             alamat: propsReq.alamat,
-            no_telp: propsReq.no_telp,
-            nama_pemilik: propsReq.nama_pemilik,
-            email: propsReq.email,
-            saldo_gerai: propsReq.saldo_gerai,
-            status_gerai: propsReq.status_gerai,
+            no_telp: propsReq.no_telp,            
+            email: propsReq.email,            
+            status_customer: propsReq.status_customer,
             verified: propsReq.verified,
             apikey: key.key
           });
@@ -116,24 +109,24 @@ export default function AdminReqEditForm(props) {
   const _onSubmit = (e) => {
     e.preventDefault();
     toast.dismiss();
-    if (!req.nama || !req.alamat || !req.no_telp || !req.nama_pemilik || !req.email || !req.status_gerai || !req.verified) {
+    if (!req.id_customer || !req.nama || !req.alamat || !req.no_telp || !req.email || !req.status_customer || !req.verified) {
       setSubmited(true);
       toast.error('Harap lengkapi pengisian', { containerId: 'B', transition: Zoom });
     }
     else {
       changeSubmitDisableState(true);
-      let url = '/app/admin/gerai/update';
-      let successMsg = 'Data gerai berhasil diubah';
+      let url = '/app/admin/customer/update';
+      let successMsg = 'Data customer berhasil diubah';
       axios.post(url, req).then(({ data }) => {
         if (data.status) {
           toast.success(successMsg, { containerId: 'B', transition: Zoom });
-          if (actionType == 'add') {            
-            setReq({...req, id_gerai:data.data})            
+          if (actionType == 'add') {
+            setReq({...req, id_customer:data.data});
             setActionType('edit');
           } else {
             //return to list after timeout
             setTimeout(
-              history.push('/master/gerai')
+              history.push('/master/customer')
               , 5000);
           }
         } else {          
@@ -161,22 +154,18 @@ export default function AdminReqEditForm(props) {
         <Col sm="12" md={{ size: 6, offset: 3 }}>
           <Card body>
             <Breadcrumb>
-              <BreadcrumbItem><a href="/#" onClick={(e) => { e.preventDefault(); history.push('/master/gerai') }}>Gerai</a></BreadcrumbItem>
-              <BreadcrumbItem active>{actionType == "add" ? "Tambah" : "Edit"} Gerai</BreadcrumbItem>
+              <BreadcrumbItem><a href="/#" onClick={(e) => { e.preventDefault(); history.push('/master/customer') }}>Customer</a></BreadcrumbItem>
+              <BreadcrumbItem active>{actionType == "add" ? "Tambah" : "Edit"} Customer</BreadcrumbItem>
             </Breadcrumb>
-            <CardTitle>{actionType == "add" ? "Tambah Gerai" : "Edit Gerai"}</CardTitle>
+            <CardTitle>{actionType == "add" ? "Tambah Customer" : "Edit Customer"}</CardTitle>
             <Form>                          
             <FormGroup>
-                <Label for="fullname">Nama Gerai</Label>
+                <Label for="fullname">Nama Customer</Label>
                 <Input id="fullname" value={req.nama} required onChange={(e) => changeReq("nama", e.target.value)} />
                 <FormFeedback>Nama tidak boleh kosong</FormFeedback>
-              </FormGroup>
+              </FormGroup>              
               <FormGroup>
-                <Label for="owner">Nama Pemilik</Label>
-                <Input id="owner" type="text" value={req.nama_pemilik} onChange={(e) => changeReq("nama_pemilik", e.target.value)} />
-              </FormGroup>  
-              <FormGroup>
-                <Label for="alamat">Alamat Gerai</Label>
+                <Label for="alamat">Alamat Customer</Label>
                 <Input id="alamat" type="textarea" value={req.alamat} onChange={(e) => changeReq("alamat", e.target.value)} />
                 <FormFeedback>Alamat tidak boleh kosong</FormFeedback>
               </FormGroup>
@@ -189,28 +178,22 @@ export default function AdminReqEditForm(props) {
                 <Label for="email">Email</Label>
                 <Input id="email" value={req.email} required onChange={(e) => changeReq("email", e.target.value)} />
                 <FormFeedback>Email tidak boleh kosong</FormFeedback>
-              </FormGroup>
-              <FormGroup>
-                <Label for="email">Saldo</Label>
-                <Input id="email" value={req.saldo_gerai} type="number" min={0} required onChange={(e) => changeReq("saldo_gerai", e.target.value)} />                
-              </FormGroup>
-              <FormGroup>
-                <Label for = "geraistatus" className = "ml-4">
-                  <Input id = "geraistatus" type = "checkbox" checked = {req.status_gerai === "NoSubs" ? false : true} onChange = {() => {changeReq("status_gerai", req.status_gerai === "NoSubs" ? "AKTIF" : "NoSubs");}}
-                  // disabled = {major.length <=0 || major.find((mq) => mq.setupquestion.length <= 0 || !mq.setupquestion) ? true : false}
-                  />
-                  Status Aktif Gerai
-                </Label>
-                <FormText color="primary">Jika aktif maka gerai telah berlangganan.</FormText>
               </FormGroup>              
               <FormGroup>
-                <Label for = "verifikasigerai" className = "ml-4">
-                  <Input id = "verifikasigerai" type = "checkbox" checked = {req.verified === "FALSE" ? false : true} onChange = {() => {changeReq("verified", req.verified === "TRUE" ? "FALSE" : "TRUE");}}
+                <Label for = "custstatus" className = "ml-4">
+                  <Input id = "custstatus" type = "checkbox" checked = {req.status_customer === "AKTIF" ? true : false} onChange = {() => {changeReq("status_customer", req.status_customer === "AKTIF" ? "NONAKTIF" : "AKTIF");}}
+                  />
+                  Status Aktif Customer
+                </Label>                
+              </FormGroup>
+              <FormGroup>
+                <Label for = "verifikasicust" className = "ml-4">
+                  <Input id = "verifikasicust" type = "checkbox" checked = {req.verified === "FALSE" ? false : true} onChange = {() => {changeReq("verified", req.verified === "TRUE" ? "FALSE" : "TRUE");}}
                   // disabled = {major.length <=0 || major.find((mq) => mq.setupquestion.length <= 0 || !mq.setupquestion) ? true : false}
                   />
-                  Status Verifikasi Gerai
+                  Status Verifikasi Customer
                 </Label>
-                <FormText color="primary">Centang jika data gerai sudah terverifikasi.</FormText>
+                <FormText color="primary">Centang jika data customer sudah terverifikasi.</FormText>
               </FormGroup>
               <hr />    
               <LaddaButton className="btn btn-primary"

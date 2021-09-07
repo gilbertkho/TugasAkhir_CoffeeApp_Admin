@@ -110,7 +110,7 @@ export default function ListPendaftar() {
     <>      
       <Card>
         <CardBody>
-          <CardTitle>Laporan Gerai</CardTitle>          
+          <CardTitle>Laporan Aktivitas</CardTitle>          
           <div className = 'my-2 rounded bg-secondary mb-2 px-3 py-2 font-weight-bold'>
             Pemesanan<br/>
             <Button color = "primary" onClick = {() => {history.push('/laporan/gerai/order')}}>
