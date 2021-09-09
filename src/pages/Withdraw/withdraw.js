@@ -43,22 +43,14 @@ export default function Withdraw() {
   const toEditUser = (user) => history.push('/subscription/edit', { user: user });
 
   const [modal, setModal] = useState(false);
+  const [modalAsk, setModalAsk] = useState(false);
   const [selectedUser, setSelectedUser] = useState({});
 
   const toggle = () => { setModal(!modal) };
+  const toggleAsk = () => { setModalAsk(!modalAsk)};
   const toggleEdit = (user) => { setModal(!modal); setSelectedUser(user) };
-  const refreshRow = (user) => {
-    axios.post('/payment/notification',{order_id: user.id_subscription}).then(({data}) => {      
-      if(data.status){
-        fetchData(param)
-      }
-      else{
-        toast.error(data.msg, {containerId:"B", transition:Zoom})
-      }
-    }).catch(error => {
-      toast.error(Errormsg['500'], {containerId:"B", transition:Zoom})
-    })
-  }
+  const toggleComplete = (user) => {setModalAsk(!modalAsk); setSelectedUser(user)};
+
   // useEffect(() => { console.log(totalSize) }, [totalSize]);
 
   const addCommas = num => num.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
@@ -70,7 +62,7 @@ export default function Withdraw() {
         <Button color="primary" className="mr-2" size="sm" onClick={(e) => { e.stopPropagation(); toggleEdit(row) }}>
           <FontAwesomeIcon icon={['fa', 'info-circle']} />
         </Button>
-        <Button color="primary" className="mr-2" size="sm" onClick={(e) => { e.stopPropagation(); setWithdrawCompleted(row) }} disabled = {row.status_penarikan === 'COMPLETED' ? true : false}>
+        <Button color="primary" className="mr-2" size="sm" onClick={(e) => { e.stopPropagation(); toggleComplete(row) }} disabled = {row.status_penarikan === 'COMPLETED' ? true : false}>
           <FontAwesomeIcon icon={['fa', 'check']} />
         </Button>
         {/* <Button color="danger" className="mr-2" size="sm" onClick={(e) => { e.stopPropagation(); toggleDelete(row) }}>
@@ -84,7 +76,7 @@ export default function Withdraw() {
     if(row.tgl_penarikan){
       return(
         <>
-          {moment(row.tgl_penarikan).format("DD MMMM YYYY, h:mm")}
+          {moment(row.tgl_penarikan).format("DD MMMM YYYY, HH:mm")}
         </>
       )
     }
@@ -122,6 +114,9 @@ export default function Withdraw() {
     dataField: 'bank',
     text: 'Bank'    
   },{
+    dataField: 'no_rek',
+    text: 'Nomor Rekening'
+  },{
     dataField: 'tgl_penarikan',
     text: 'Tanggal Penarikan',
     formatter: timeFormat
@@ -131,7 +126,7 @@ export default function Withdraw() {
     formatter: moneyFormat
   },{
     dataField: 'status_penarikan',
-    text: 'Status Langganan',
+    text: 'Status Penarikan',
     formatter: statusFormat
   }];
 
@@ -173,7 +168,8 @@ export default function Withdraw() {
     axios.post('app/admin/gerai/withdraw/complete',{id_penarikan: row.id_penarikan, apikey: param.apikey}).then(({data}) => {
       if(data.status){
         fetchData(param)
-        toast.success('Penarikan dana berhasil dikirim ke rekening gerai', {containerId:'B', transition: Zoom})        
+        toggleAsk;
+        toast.success('Penarikan dana berhasil dikirim ke rekening gerai', {containerId:'B', transition: Zoom});
       } else {
         toast.error(data.msg, { containerId: 'B', transition: Zoom });    
       }
@@ -228,7 +224,15 @@ export default function Withdraw() {
             <Col xs={8}>{": " + selectedUser.nama}</Col>
           </Row>
           <Row>
-            <Col xs={4}>Nama Gerai</Col>
+            <Col xs={4}>Bank</Col>
+            <Col xs={8}>{": " + selectedUser.bank}</Col>
+          </Row>
+          <Row>
+            <Col xs={4}>Nomor Rekening</Col>
+            <Col xs={8}>{": " + selectedUser.no_rek}</Col>
+          </Row>
+          <Row>
+            <Col xs={4}>Tanggal Penarikan</Col>
             <Col xs={8}>{": " + moment(selectedUser.tgl_penarikan).format('DD MMMM YYYY, h:mm')}</Col>
           </Row>
           <Row>
@@ -243,6 +247,43 @@ export default function Withdraw() {
         <ModalFooter>
           {/* <Button color="primary" onClick={toggle}>Do Something</Button>{' '} */}
           <Button color="secondary" onClick={toggle}>Tutup</Button>
+        </ModalFooter>
+      </Modal>
+      <Modal zIndex={2000} centered isOpen={modalAsk} toggle={toggleAsk}>
+      <ModalHeader toggle={toggleAsk}>Apakah proses pengiriman dana telah berhasil dilakukan?</ModalHeader>        
+        <ModalBody>
+          <Row>
+            <Col xs={4}>ID Penarikan</Col>
+            <Col xs={8}>{": " + selectedUser.id_penarikan}</Col>
+          </Row>
+          <Row>
+            <Col xs={4}>Nama Gerai</Col>
+            <Col xs={8}>{": " + selectedUser.nama}</Col>
+          </Row>
+          <Row>
+            <Col xs={4}>Bank</Col>
+            <Col xs={8}>{": " + selectedUser.bank}</Col>
+          </Row>
+          <Row>
+            <Col xs={4}>Nomor Rekening</Col>
+            <Col xs={8}>{": " + selectedUser.no_rek}</Col>
+          </Row>
+          <Row>
+            <Col xs={4}>Tanggal Penarikan</Col>
+            <Col xs={8}>{": " + moment(selectedUser.tgl_penarikan).format('DD MMMM YYYY, h:mm')}</Col>
+          </Row>
+          <Row>
+            <Col xs={4}>Jumlah Penarikan</Col>
+            <Col xs={8}>: {selectedUser.jumlah_penarikan ? 'Rp.' + addCommas(selectedUser.jumlah_penarikan) : null}</Col>
+          </Row>
+          <Row>
+            <Col xs={4}>Status Penarikan</Col>
+            <Col xs={8}>{": " + selectedUser.status_penarikan}</Col>
+          </Row>          
+        </ModalBody>
+        <ModalFooter>
+          <Button color="primary" onClick={() => { setWithdrawCompleted(selectedUser)}}>Complete</Button>{' '}
+          <Button color="secondary" onClick={toggleAsk}>Tutup</Button>
         </ModalFooter>
       </Modal>
       <Card>
