@@ -86,7 +86,7 @@ export default function ListPendaftar() {
     let date = new Date(row.tgl_pesanan);    
     return(
       <>
-        {moment(row.tgl_pesanan).format('DD MMM YYYY, HH:mm')}
+        {moment(row.tgl_pesanan).format('DD MMM YYYY, H:mm')}
       </>
     )
   }
