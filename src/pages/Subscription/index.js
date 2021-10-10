@@ -124,7 +124,7 @@ export default function ListPendaftar() {
     return(
       <strong className = "text-warning">{row.status_subscription}</strong>
     )
-    else if(row.status_subscription === 'DENY' || row.status_subscription === 'FAILED' )
+    else if(row.status_subscription === 'DENY' || row.status_subscription === 'FAILED' || row.status_subscription === 'OFF' )
     return(
       <strong className = "text-danger">{row.status_subscription}</strong>
     )
